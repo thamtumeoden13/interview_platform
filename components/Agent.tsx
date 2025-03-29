@@ -35,7 +35,7 @@ const Agent = ({
   const [messages, setMessages] = useState<SavedMessage[]>([]);
 
   const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-    console.log("Generate feedback here,");
+    console.log("Generate feedback here");
 
     const { success, feedbackId: id } = await createFeedback({
       interviewId: interviewId!,
@@ -87,10 +87,9 @@ const Agent = ({
   }, []);
 
   useEffect(() => {
-
     if (callStatus === CallStatus.FINISHED) {
-      console.log({type,messages})
-      if ((type == "generate")) {
+      console.log({ type, messages });
+      if (type == "generate") {
         router.push("/");
       } else {
         handleGenerateFeedback(messages);

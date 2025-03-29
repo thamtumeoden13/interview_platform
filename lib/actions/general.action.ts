@@ -60,6 +60,8 @@ export async function createFeedback(params: CreateFeedbackParams) {
       )
       .join("");
 
+    console.log('before generateObject', formattedTranscript)
+
     const {
       object: {
         totalScore,
@@ -89,6 +91,12 @@ export async function createFeedback(params: CreateFeedbackParams) {
         "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories",
     });
 
+    console.log('before add feedbacks',{totalScore,
+        categoryScores,
+        strengths,
+        areasForImprovement,
+        finalAssessment,})
+
     const feedback = await db.collection("feedbacks").add({
       interviewId,
       userId,
@@ -105,9 +113,31 @@ export async function createFeedback(params: CreateFeedbackParams) {
       feedbackId: feedback.id,
     };
   } catch (error) {
-    console.error("Error saving feedback", error);
+    console.error(error);
     return {
       success: false,
     };
   }
+}
+
+
+export async function getFeedbackByInterviewId(
+  params: GetFeedbackByInterviewIdParams
+): Promise<Feedback | null> {
+  const { interviewId, userId } = params;
+
+  const feedback = await db
+    .collection("feedbacks")
+    .where("interviewId", "==", interviewId)
+    .where("userId", "==", userId)
+    .limit(1)
+    .get();
+
+    if(feedback.empty) return null
+
+    const feedbackDoc = feedback.docs[0];
+
+  return {
+    id: feedbackDoc.id, ...feedbackDoc.data()
+  } as Feedback;
 }
